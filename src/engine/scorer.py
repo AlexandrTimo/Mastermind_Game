@@ -1,3 +1,4 @@
+from src.services.random_org import get_secret_digits
 
 '''
 Game initializes and selects “0 1 3 5”
@@ -14,6 +15,8 @@ def random_nums():
     duplicates = set()
     # add secret numbers to dict "0 1 3 5"
     secret_dict = {0: 0, 1: 1, 3: 2, 5: 3}
+    print(get_secret_digits())
+    
 
     # enter list of numbers 
     num_check = enter_numbers()
