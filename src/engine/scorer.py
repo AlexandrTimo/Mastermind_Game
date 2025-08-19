@@ -33,22 +33,60 @@ def random_nums():
 
     return f"{cn} correct number and {cl} correct location"
 
+def parse_guess_line(raw: str) -> list[int]:
+    """
+    Accepts formats like:
+      1425
+      1,4,2,5
+      1 4 2 5
+      1      4 2         5
+      1,4       2         5
+    Returns a list of 4 ints in [0,7] or raises ValueError.
+    """
+    s = raw.strip()
+    if not s:
+        raise ValueError("Empty input. Please enter 4 digits (0–7).")
 
+    # Case 1: compact 4 digits (e.g., "1425")
+    if s.isdigit() and len(s) == 4:
+        nums = [int(ch) for ch in s]
+    else:
+        # Case 2: any mix of commas/whitespace; explode digit-runs into single digits
+        parts = s.replace(",", " ").split()
+        digits = []
+        for p in parts:
+            if not p.isdigit():
+                raise ValueError(f"Invalid token: {p!r}. Use digits 0–7 and separators (space/comma).")
+            for ch in p:  # explode "22" -> "2","2"
+                d = int(ch)
+                if not (0 <= d <= 7):
+                    raise ValueError("Digits must be between 0 and 7.")
+                digits.append(d)
+                if len(digits) > 4:
+                    raise ValueError("Please enter exactly 4 digits.")
+        nums = digits
 
-def enter_numbers():
-    my_list = []
+    # Length check
+    if len(nums) != 4:
+        raise ValueError(f"Please enter exactly 4 numbers. Got {len(nums)}.")
 
-    while len(my_list) < 4:
+    # Range check
+    for n in nums:
+        if not (0 <= n <= 7):
+            raise ValueError("Digits must be between 0 and 7.")
 
+    return nums
+
+def enter_numbers() -> list[int]:
+    """
+    Prompts until a valid 4-digit guess is entered.
+    """
+    while True:
+        raw = input("Enter 4 digits (0–7) e.g. 1425 or 1,4,2,5: ")
         try:
-            num = int(input(f"Enter integer {len(my_list) + 1} of 4: "))
-            my_list.append(num)
-        except ValueError:
-            print("Invalid input. Please enter an integer.")
-        except 0 > num > 7:
-            print("Invalid input. Please enter an integer between 0 and 7")
-
-
-    return my_list
+            return parse_guess_line(raw)
+        except ValueError as e:
+            print(e)
+            # loop continues to re-prompt
 
 print(random_nums())
