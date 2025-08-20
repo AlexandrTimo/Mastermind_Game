@@ -58,3 +58,6 @@ def get_secret_digits():
         # 6) Fallback: if anything fails above, generate 4 digits locally (0..7).
         fallback_digits = [randbelow(8) for _ in range(4)]
         return fallback_digits, "fallback"
+    
+
+# print(get_secret_digits())

@@ -13,12 +13,17 @@ def random_nums():
     cl = 0
     cn = 0
     duplicates = set()
+    secret_dict = {}
     # add secret numbers to dict "0 1 3 5"
-    secret_dict = {0: 0, 1: 1, 3: 2, 5: 3}
-    print(get_secret_digits())
-    
+    # secret_dict = {0: 0, 1: 1, 3: 2, 5: 3}
+    secret_nums, status = get_secret_digits()
 
-    # enter list of numbers 
+    # Add secret nums to the dictionary
+    for el in range(len(secret_nums)):
+        secret_dict[secret_nums[el]] = el
+    # print(secret_dict)
+    
+    # Enter list of numbers 
     num_check = enter_numbers()
 
     # check each item in the list if index or item matched
@@ -43,7 +48,7 @@ def parse_guess_line(raw: str) -> list[int]:
       1,4,2,5
       1 4 2 5
       1      4 2         5
-      1,4       2         5
+      1,4       2         25
     Returns a list of 4 ints in [0,7] or raises ValueError.
     """
     s = raw.strip()
