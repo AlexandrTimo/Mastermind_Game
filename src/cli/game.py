@@ -50,8 +50,7 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
     DIGIT_MIN = 0
 
     # get secret using difficulty
-    # secret_nums, source = get_secret_digits(num=secret_len, min=DIGIT_MIN, max=digit_max)
-    secret_nums, source = get_secret_digits()
+    secret_nums, source = get_secret_digits(secret_len, DIGIT_MIN, digit_max)
     attempts_left = attempts
     hints_used = 0
     revealed_digits = set()
@@ -103,7 +102,6 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
             continue
             # loop continues to re-prompt
 
-        # guess = enter_numbers()
         cn, cl = score_guess(secret_nums, guess)
         history.append({'guess': guess, 'CL' : cl, 'CN' : cn}) # Able to check during the game
 
