@@ -66,7 +66,7 @@ def main():
 
     while attempts_left > 0:
         guess = enter_numbers()
-        cl, cn = score_guess(secret_nums, guess)
+        cn, cl = score_guess(secret_nums, guess)
         history.append({'guess': guess, 'CL' : cl, 'CN' : cn})
 
         if cl == 0 and cn == 0:
