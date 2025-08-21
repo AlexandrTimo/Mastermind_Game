@@ -1,6 +1,7 @@
 import requests
 from secrets import randbelow
 
+# def get_secret_digits(num=SECRET_LEN, min=0, max=digit_max):
 def get_secret_digits():
     """
     Get 4 digits for Mastermind.

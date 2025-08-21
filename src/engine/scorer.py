@@ -6,12 +6,11 @@ Player guesses “2 2 1 1”, game responds “1 correct number and 0 correct lo
 Player guesses “0 1 5 6”, game responds “3 correct numbers and 2 correct location”
 '''
 
-def score_guess(secret_nums : list, num_check: list):
+def score_guess(secret_nums: list, num_check: list):
 
     print(f'Secret : {secret_nums}')
     cl = 0
     cn = 0
-    # duplicates = set()
     secret_freq = {}
     
     # Count location matches
@@ -19,9 +18,11 @@ def score_guess(secret_nums : list, num_check: list):
         if secret_nums[i] == num_check[i]:
             cl += 1
 
+    # Travers secret_nums count dpulictes and store them in the dict
     for el in secret_nums:
         secret_freq[el] = secret_freq.get(el, 0) + 1
 
+    # Travers num_check and decrese dict values
     for el in num_check:
         if el in secret_freq:
             if secret_freq.get(el, 0) > 0:
