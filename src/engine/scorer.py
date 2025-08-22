@@ -1,3 +1,5 @@
+from typing import List, Tuple
+
 '''
 Game initializes and selects “0 1 3 5”
 Player guesses “2 2 4 6”, game responds “all incorrect”
@@ -6,16 +8,17 @@ Player guesses “2 2 1 1”, game responds “1 correct number and 0 correct lo
 Player guesses “0 1 5 6”, game responds “3 correct numbers and 2 correct location”
 '''
 
-def score_guess(secret_nums: list, num_check: list):
 
-    print(f'Secret : {secret_nums}')
+def score_guess(secret_nums: List, guess_check: List) -> Tuple:
+
+    # print(f'Secret : {secret_nums}')
     cl = 0
     cn = 0
     secret_freq = {}
     
     # Count location matches
     for i in range(4):
-        if secret_nums[i] == num_check[i]:
+        if secret_nums[i] == guess_check[i]:
             cl += 1
 
     # Travers secret_nums count dpulictes and store them in the dict
@@ -23,7 +26,7 @@ def score_guess(secret_nums: list, num_check: list):
         secret_freq[el] = secret_freq.get(el, 0) + 1
 
     # Travers num_check and decrese dict values
-    for el in num_check:
+    for el in guess_check:
         if el in secret_freq:
             if secret_freq.get(el, 0) > 0:
                 secret_freq[el] -= 1

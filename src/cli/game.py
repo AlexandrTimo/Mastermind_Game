@@ -10,7 +10,7 @@ def parse_guess_line(raw: str, secret_len: int = 4, digit_min: int = 0, digit_ma
       1 4 2 5
       1      4 2         5
       1,4       2         25
-    Returns a list of 4 ints in [0,7] or raises ValueError.
+    Returns secret_len ints in [digit_min..digit_max] or raises ValueError.
     """
 
     s = raw.strip()
@@ -46,16 +46,14 @@ def parse_guess_line(raw: str, secret_len: int = 4, digit_min: int = 0, digit_ma
 
 def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secret_len: int = 4):
 
-    # 0..digit_max inclusive
-    DIGIT_MIN = 0
-
     # get secret using difficulty
-    secret_nums, source = get_secret_digits(secret_len, DIGIT_MIN, digit_max)
+    secret_nums, source = get_secret_digits(num=secret_len, digit_min=0, digit_max=digit_max)
     attempts_left = attempts
     hints_used = 0
     revealed_digits = set()
     history = []
     print(f"(Secret generated via {source}. Difficulty: 0–{digit_max}, length={secret_len}, attempts={attempts})")
+    print(f'Secret : {secret_nums}')
 
     while attempts_left > 0:
 
@@ -95,7 +93,7 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
 
         # otherwise, treat as a guess
         try:
-            guess = parse_guess_line(raw, secret_len=secret_len, digit_min=DIGIT_MIN, digit_max=digit_max)
+            guess = parse_guess_line(raw, secret_len=secret_len, digit_min=0, digit_max=digit_max)
             # guess = parse_guess_line(raw)
         except ValueError as e:
             print(e)
@@ -103,7 +101,7 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
             # loop continues to re-prompt
 
         cn, cl = score_guess(secret_nums, guess)
-        history.append({'guess': guess, 'CL' : cl, 'CN' : cn}) # Able to check during the game
+        history.append({'guess': guess, 'Correct Location' : cl, 'Correct Number' : cn}) # Able to check during the game
 
         if cl == 0 and cn == 0:
             print(f"Player guesses {guess}, game responds 'all incorrect'")
@@ -112,6 +110,9 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
             
         if cl == secret_len:
             print("Congrats we have a winner!!!")
+            # Joke : For the winner > Donate 1$ to kitten shelter
+            if len(history) == 1:
+                print("🎉 First try! Consider donating $1 to a kitten shelter 😺")
             break
 
         attempts_left -= 1
@@ -121,11 +122,9 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
         print(f"Game Over! The player’s guess was incorrect. The secret numbers are {secret_nums}")
 
 
-def main():
+def main(): 
     
-    
-    # Data base > Result : Name | Attempts
-    # Joke : For the winner > Donate 1$ to kitten shelter
+    # Data base > Result : Place | Name | Attempts (Top 5) Option in the end of the game
 
     # Enter your name
     player_name = input("Enter your name: ").strip() or "Player"
