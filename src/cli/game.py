@@ -55,7 +55,7 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
     revealed_digits = set()
     history = []
     print(f"(Secret generated via {source}. Difficulty: 0–{digit_max}, length={secret_len}, attempts={attempts})")
-    print(f'Secret : {secret_nums}')
+    # print(f'Secret : {secret_nums}')
 
     while attempts_left > 0:
 
@@ -126,13 +126,26 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
             if first_try:
                 print("🎉 First try! Consider donating $1 to a kitten shelter 😺")
 
-            # Offer to show Top 5 BEST (fewest attempts)
-            show = input("Type 'results' to see Top 5 best (fewest attempts): ").strip().lower()
-            if show == "results":
-                rows = get_top5_best_attempts()
-                print_top5_table(rows)
+            # Offer to show the leaderboard (loop until valid input)
+            while True:
+                show = input(
+                    "Type 'results' to see Top 5 best (fewest attempts), "
+                    "'quit' to exit, or just press Enter to continue: "
+                ).strip().lower()
 
-            break
+                if show == "results":
+                    rows = get_top5_best_attempts()
+                    print_top5_table(rows)
+                    break  # done with this prompt; continue finishing the win flow
+                elif show == "quit":
+                    print("Goodbye!")
+                    return  # end the game function cleanly
+                elif show == "" or show == "continue":
+                    break  # player chose to just continue
+                else:
+                    print("Invalid option. Please type 'results', 'quit', or press Enter.")
+                    # loop continues and asks again
+
 
         attempts_left -= 1
         print(f"Attempts left: {attempts_left}")
@@ -148,17 +161,20 @@ def main():
 
     # Enter your name
     player_name = input("Enter your name: ").strip() or "Player"
-    # Select Difficulty : Normal(0-7) and Hard(0-9)
-    choice = input(f"Welcome {player_name}! Choose difficulty (Normal/Hard): ").strip().lower()
-    SECRET_LEN = 4
 
-    if choice == "hard":
-        # Hard: 0–9, 1 hint, you can keep attempts=10 or tweak
-        start_game_with_lvl(digit_max=9, hints_max=1, attempts=10, secret_len=SECRET_LEN, player_name=player_name, difficulty_label=choice)
-    else:
-        # Normal: 0–7, 2 hints
-        start_game_with_lvl(digit_max=7, hints_max=2, attempts=10, secret_len=SECRET_LEN, player_name=player_name, difficulty_label=choice)  
+    while True:
+        # Select Difficulty : Normal(0-7) and Hard(0-9)
+        choice = input(f"Welcome {player_name}! Choose difficulty (Normal/Hard): ").strip().lower()
+        if choice == "hard":
+            # Hard: 0–9, 1 hint
+            start_game_with_lvl(digit_max=9, hints_max=1, attempts=10, secret_len=4, player_name=player_name, difficulty_label='hard')
+            break
+        if choice == "normal":
+            # Normal: 0–7, 2 hints
+            start_game_with_lvl(digit_max=7, hints_max=2, attempts=10, secret_len=4, player_name=player_name, difficulty_label='normal') 
+            break
+        
+        print("Invalid option. Please choose difficulty (Normal/Hard):")
         
 if __name__ == "__main__":
     main()
-    
