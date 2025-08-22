@@ -1,5 +1,7 @@
 from ..services.random_org import get_secret_digits
 from ..engine.scorer import score_guess
+from ..services.db import init_db, save_result, get_top5_best_attempts, print_top5_table
+
 
 
 def parse_guess_line(raw: str, secret_len: int = 4, digit_min: int = 0, digit_max: int = 7) -> list[int]:
@@ -44,7 +46,7 @@ def parse_guess_line(raw: str, secret_len: int = 4, digit_min: int = 0, digit_ma
     return digits
 
 
-def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secret_len: int = 4):
+def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secret_len: int = 4, player_name: str = "Player", difficulty_label: str = "normal",):
 
     # get secret using difficulty
     secret_nums, source = get_secret_digits(num=secret_len, digit_min=0, digit_max=digit_max)
@@ -69,7 +71,7 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
                 print("No guesses yet.")
             else:
                 for idx, rec in enumerate(history, 1):
-                    print(f"#{idx}: {rec['guess']} > CN={rec['CN']}, CL={rec['CL']}")
+                    print(f"#{idx}: {rec['guess']} > CN={rec['Correct Numbers']}, CL={rec['Correct Locations']}")
             continue
 
         # Hints during the game: secret numbers > Normal : 2 attempts | 1 attempt
@@ -101,30 +103,48 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
             # loop continues to re-prompt
 
         cn, cl = score_guess(secret_nums, guess)
-        history.append({'guess': guess, 'Correct Location' : cl, 'Correct Number' : cn}) # Able to check during the game
+        history.append({'guess': guess, 'Correct Locations' : cl, 'Correct Numbers' : cn}) # Able to check during the game
 
         if cl == 0 and cn == 0:
             print(f"Player guesses {guess}, game responds 'all incorrect'")
         else:
             print(f"Player guesses {guess}, game responds {cn} correct numbers and {cl} correct locations")
-            
+      
         if cl == secret_len:
             print("Congrats we have a winner!!!")
-            # Joke : For the winner > Donate 1$ to kitten shelter
-            if len(history) == 1:
+
+            attempts_used = len(history)              # guesses taken to win (hints not counted)
+            if attempts_used == 1:
+                first_try = 1
+            else:
+                first_try = 0
+
+            # Save only winners (you already do this)
+            save_result(player_name, attempts_used, difficulty_label, "win", first_try)
+
+            # Kitten-shelter joke for first-try
+            if first_try:
                 print("🎉 First try! Consider donating $1 to a kitten shelter 😺")
+
+            # Offer to show Top 5 BEST (fewest attempts)
+            show = input("Type 'results' to see Top 5 best (fewest attempts): ").strip().lower()
+            if show == "results":
+                rows = get_top5_best_attempts()
+                print_top5_table(rows)
+
             break
 
         attempts_left -= 1
         print(f"Attempts left: {attempts_left}")
 
-    if attempts_left == 0 and (not history or history[-1]['CL'] != secret_len):
+    if attempts_left == 0 and (not history or history[-1]['Correct Locations'] != secret_len):
         print(f"Game Over! The player’s guess was incorrect. The secret numbers are {secret_nums}")
 
 
 def main(): 
     
     # Data base > Result : Place | Name | Attempts (Top 5) Option in the end of the game
+    init_db()  # make sure the DB/table exists
 
     # Enter your name
     player_name = input("Enter your name: ").strip() or "Player"
@@ -134,10 +154,11 @@ def main():
 
     if choice == "hard":
         # Hard: 0–9, 1 hint, you can keep attempts=10 or tweak
-        start_game_with_lvl(digit_max=9, hints_max=1, attempts=10, secret_len=SECRET_LEN)
+        start_game_with_lvl(digit_max=9, hints_max=1, attempts=10, secret_len=SECRET_LEN, player_name=player_name, difficulty_label=choice)
     else:
         # Normal: 0–7, 2 hints
-        start_game_with_lvl(digit_max=7, hints_max=2, attempts=10, secret_len=SECRET_LEN)   
+        start_game_with_lvl(digit_max=7, hints_max=2, attempts=10, secret_len=SECRET_LEN, player_name=player_name, difficulty_label=choice)  
         
 if __name__ == "__main__":
     main()
+    
