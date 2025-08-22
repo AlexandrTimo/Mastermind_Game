@@ -71,7 +71,7 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
                 print("No guesses yet.")
             else:
                 for idx, rec in enumerate(history, 1):
-                    print(f"#{idx}: {rec['guess']} > CN={rec['Correct Numbers']}, CL={rec['Correct Locations']}")
+                    print(f"#{idx}: {rec['guess']} > Correct Numbers = {rec['CN']}, Correct Locations = {rec['CL']}")
             continue
 
         # Hints during the game: secret numbers > Normal : 2 attempts | 1 attempt
@@ -103,7 +103,7 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
             # loop continues to re-prompt
 
         cn, cl = score_guess(secret_nums, guess)
-        history.append({'guess': guess, 'Correct Locations' : cl, 'Correct Numbers' : cn}) # Able to check during the game
+        history.append({'guess': guess, 'CL' : cl, 'CN' : cn}) # Able to check during the game
 
         if cl == 0 and cn == 0:
             print(f"Player guesses {guess}, game responds 'all incorrect'")
@@ -150,7 +150,7 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
         attempts_left -= 1
         print(f"Attempts left: {attempts_left}")
 
-    if attempts_left == 0 and (not history or history[-1]['Correct Locations'] != secret_len):
+    if attempts_left == 0 and (not history or history[-1]['CL'] != secret_len):
         print(f"Game Over! The player’s guess was incorrect. The secret numbers are {secret_nums}")
 
 
@@ -174,7 +174,7 @@ def main():
             start_game_with_lvl(digit_max=7, hints_max=2, attempts=10, secret_len=4, player_name=player_name, difficulty_label='normal') 
             break
         
-        print("Invalid option. Please choose difficulty (Normal/Hard):")
+        print("Invalid option. Please choose Normal or Hard:")
         
 if __name__ == "__main__":
     main()
