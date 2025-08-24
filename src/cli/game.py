@@ -46,7 +46,7 @@ def parse_guess_line(raw: str, secret_len: int = 4, digit_min: int = 0, digit_ma
     return digits
 
 
-def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secret_len: int = 4, player_name: str = "Player", difficulty_label: str = "normal",):
+def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secret_len: int = 4, player_name: str = "Player", difficulty_label: str = "normal"):
 
     # get secret using difficulty
     secret_nums, source = get_secret_digits(num=secret_len, digit_min=0, digit_max=digit_max)
@@ -54,8 +54,9 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
     hints_used = 0
     revealed_digits = set()
     history = []
+    # Introduction
     print(f"(Secret generated via {source}. Difficulty: 0–{digit_max}, length={secret_len}, attempts={attempts})")
-    # print(f'Secret : {secret_nums}')
+    print(f'Secret : {secret_nums}')
 
     while attempts_left > 0:
 
@@ -81,8 +82,8 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
                 continue
             if attempts_left <= 1:
                 print("You need at least 2 attempts left to use a hint.")
-                continue
-            # reveal one digit value (not the position), preferably one not yet revealed
+                continue 
+            # Reveal one digit value (not the position), preferably one not yet revealed
             for val in secret_nums:
                 if val not in revealed_digits:
                     print(f"Hint: one of the secret digits is {val} (position not revealed).")
@@ -93,14 +94,13 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
             print(f"Attempts left: {attempts_left}")
             continue
 
-        # otherwise, treat as a guess
+        # Otherwise, treat as a guess
         try:
             guess = parse_guess_line(raw, secret_len=secret_len, digit_min=0, digit_max=digit_max)
-            # guess = parse_guess_line(raw)
         except ValueError as e:
             print(e)
             continue
-            # loop continues to re-prompt
+            # Loop continues to re-prompt
 
         cn, cl = score_guess(secret_nums, guess)
         history.append({'guess': guess, 'CL' : cl, 'CN' : cn}) # Able to check during the game
@@ -113,13 +113,14 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
         if cl == secret_len:
             print("Congrats we have a winner!!!")
 
-            attempts_used = len(history)              # guesses taken to win (hints not counted)
+            # Guesses taken to win (hints not counted)
+            attempts_used = len(history)              
             if attempts_used == 1:
                 first_try = 1
             else:
                 first_try = 0
 
-            # Save only winners (you already do this)
+            # Save only winners
             save_result(player_name, attempts_used, difficulty_label, "win", first_try)
 
             # Kitten-shelter joke for first-try
@@ -139,7 +140,7 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
                     break  # done with this prompt; continue finishing the win flow
                 elif show == "quit":
                     print("Goodbye!")
-                    return  # end the game function cleanly
+                    return  # end the game function
                 elif show == "" or show == "continue":
                     break  # player chose to just continue
                 else:
@@ -150,6 +151,7 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
         attempts_left -= 1
         print(f"Attempts left: {attempts_left}")
 
+    # check attempts_left and history elements in the end of the game; and check at the last guess in the history + the number of Correct Locations. 
     if attempts_left == 0 and (not history or history[-1]['CL'] != secret_len):
         print(f"Game Over! The player’s guess was incorrect. The secret numbers are {secret_nums}")
 

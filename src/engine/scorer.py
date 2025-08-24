@@ -9,7 +9,7 @@ Player guesses “0 1 5 6”, game responds “3 correct numbers and 2 correct l
 '''
 
 
-def score_guess(secret_nums: List, guess_check: List) -> Tuple:
+def score_guess(secret_nums: List, guess_nums: List) -> Tuple:
 
     # print(f'Secret : {secret_nums}')
     cl = 0
@@ -18,7 +18,7 @@ def score_guess(secret_nums: List, guess_check: List) -> Tuple:
     
     # Count location matches
     for i in range(4):
-        if secret_nums[i] == guess_check[i]:
+        if secret_nums[i] == guess_nums[i]:
             cl += 1
 
     # Travers secret_nums count dpulictes and store them in the dict
@@ -26,7 +26,7 @@ def score_guess(secret_nums: List, guess_check: List) -> Tuple:
         secret_freq[el] = secret_freq.get(el, 0) + 1
 
     # Travers num_check and decrese dict values
-    for el in guess_check:
+    for el in guess_nums:
         if el in secret_freq:
             if secret_freq.get(el, 0) > 0:
                 secret_freq[el] -= 1
