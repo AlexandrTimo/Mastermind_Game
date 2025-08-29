@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "▶ Game (run as module)",
+      "type": "python",
+      "request": "launch",
+      "module": "src.cli.game",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "▶ Scorer (run as module)",
+      "type": "python",
+      "request": "launch",
+      "module": "src.engine.scorer",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "🧪 Debug pytest -k",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-k", "test_name", "-q"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ]
+}

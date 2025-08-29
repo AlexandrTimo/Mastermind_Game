@@ -1,4 +1,5 @@
 import requests
+from requests import exceptions as req_exc
 from secrets import randbelow
 from typing import List, Tuple
 
@@ -21,20 +22,41 @@ def get_secret_digits(num: int = 4, digit_min: int = 0, digit_max: int = 7) -> T
     }
     headers = {"User-Agent": "Mastermind/0.1 (+contact-or-repo)"}
 
+    # helper: print reason, prompt Enter, then produce fallback digits
+    def _fallback_with_prompt(reason_msg: str) -> Tuple[List[int], str]:
+        if reason_msg:
+            print(reason_msg)
+        try:
+            input("Press Enter to launch local generator — fallback...\n")
+        except EOFError:
+            pass  # non-interactive env (tests/CI)
+        print("Running game locally — fallback version.")
+        span = digit_max - digit_min + 1
+        fallback_digits = []
+        for _ in range(num):
+            # randbelow(span) returns 0..(span-1). Shift by digit_min to match our range.
+            fallback_digits.append(digit_min + randbelow(span))
+        return fallback_digits, "fallback"
+
+    # Basic parameter sanity (prevents bad span in fallback)
+    if num <= 0 or digit_min > digit_max:
+        return _fallback_with_prompt("Bad parameters to RNG (num must be >= 1 and min <= max).")
+
     try:
         # 1) Make the HTTP request. Short timeout so the game doesn't hang.
         resp = requests.get(url, params=params, headers=headers, timeout=3)
 
         # 2) Must be HTTP 200 OK.
         if resp.status_code != 200:
-            raise ValueError("Unexpected HTTP status")
+            raise ValueError(f"URL incorrect or has bad response (HTTP {resp.status_code}).")
 
         # 3) Get the response text and remove spaces at the ends.
         body = resp.text.strip()
 
         # 4) RANDOM.ORG sends error messages starting with "Error:"
         if body.startswith("Error:"):
-            raise ValueError("Random.org error body")
+            first_line = body.splitlines()[0]
+            raise ValueError(f"Random.org error body: {first_line}")
 
         # 5) Split into lines and keep only non-empty lines (some responses have a blank at the end).
         raw_lines = body.splitlines()
@@ -49,7 +71,7 @@ def get_secret_digits(num: int = 4, digit_min: int = 0, digit_max: int = 7) -> T
             raise ValueError("Wrong number of lines in response")
 
         # 7) Convert each line to an int and check the range.
-        digits: List[int] = []
+        digits = []
         for item in lines:
             # Convert text like "5" to int 5
             try:
@@ -66,11 +88,10 @@ def get_secret_digits(num: int = 4, digit_min: int = 0, digit_max: int = 7) -> T
         # 8) Everything looks good → use the API digits.
         return digits, "random.org"
 
-    except Exception:
-        # 9) Anything goes wrong → secure local fallback.
-        span = digit_max - digit_min + 1
-        fallback_digits: List[int] = []
-        for _ in range(num):
-            # randbelow(span) returns 0..(span-1). Shift by digit_min to match our range.
-            fallback_digits.append(digit_min + randbelow(span))
-        return fallback_digits, "fallback"
+    except req_exc.RequestException as e:
+        # 9) Covers DNS errors, timeouts, connection errors > secure local fallback.
+        return _fallback_with_prompt(f"URL incorrect or has bad response: {e}")
+        
+    except Exception as e:
+        # Any other parsing/validation error
+        return _fallback_with_prompt(str(e))

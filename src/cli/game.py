@@ -23,7 +23,9 @@ def parse_guess_line(raw: str, secret_len: int = 4, digit_min: int = 0, digit_ma
     parts = s.replace(",", " ").split()
     digits = []
 
-    # Explode each token into single digits (so '22' => '2','2')
+    # ATTENTION TO UNDERSTAND!!!! >>>>
+
+    # Explore each token into single digits (so '22' => '2','2')
     if len(parts) == 1 and parts[0].isdigit() and len(parts[0]) == secret_len:
         # compact form like "1425"
         digits = [int(ch) for ch in parts[0]]
@@ -54,19 +56,22 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
     hints_used = 0
     revealed_digits = set()
     history = []
-    # Introduction
+
+    # Introduction of level settings
     print(f"(Secret generated via {source}. Difficulty: 0–{digit_max}, length={secret_len}, attempts={attempts})")
     print(f'Secret : {secret_nums}')
 
+    # Commands to select
     while attempts_left > 0:
 
         raw = input("Enter guess (e.g., 1425 or 1,4,2,5). Type 'history', 'hint', or 'quit': ").strip().lower()
-        # commands
+    
+        # 1. Quit the game
         if raw == "quit":
             print("Goodbye! Game aborted.")
             return
         
-        # Check history of previous guess during the game
+        # 2. Check history of previous guess (during the game)
         if raw == "history":
             if not history:
                 print("No guesses yet.")
@@ -75,7 +80,7 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
                     print(f"#{idx}: {rec['guess']} > Correct Numbers = {rec['CN']}, Correct Locations = {rec['CL']}")
             continue
 
-        # Hints during the game: secret numbers > Normal : 2 attempts | 1 attempt
+        # 3. Hints during the game: show the secret numbers > Normal : 2 attempts | Hard : 1 attempt
         if raw == "hint":
             if hints_used >= hints_max:
                 print("No hints left for this difficulty.")
@@ -94,7 +99,7 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
             print(f"Attempts left: {attempts_left}")
             continue
 
-        # Otherwise, treat as a guess
+        # 4. Guess Numbers 
         try:
             guess = parse_guess_line(raw, secret_len=secret_len, digit_min=0, digit_max=digit_max)
         except ValueError as e:
@@ -110,6 +115,7 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
         else:
             print(f"Player guesses {guess}, game responds {cn} correct numbers and {cl} correct locations")
       
+        # Win the game
         if cl == secret_len:
             print("Congrats we have a winner!!!")
 
@@ -127,7 +133,7 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
             if first_try:
                 print("🎉 First try! Consider donating $1 to a kitten shelter 😺")
 
-            # Offer to show the leaderboard (loop until valid input)
+            # Offer to show the leaderboard DB (loop until valid input)
             while True:
                 show = input(
                     "Type 'results' to see Top 5 best (fewest attempts), "
@@ -147,11 +153,11 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
                     print("Invalid option. Please type 'results', 'quit', or press Enter.")
                     # loop continues and asks again
 
-
         attempts_left -= 1
         print(f"Attempts left: {attempts_left}")
 
-    # check attempts_left and history elements in the end of the game; and check at the last guess in the history + the number of Correct Locations. 
+    # Loss the game
+    # check attempts_left and history elements in the end of the game; and check at the last guess in the history + the number of correct locations. 
     if attempts_left == 0 and (not history or history[-1]['CL'] != secret_len):
         print(f"Game Over! The player’s guess was incorrect. The secret numbers are {secret_nums}")
 
@@ -167,6 +173,7 @@ def main():
     while True:
         # Select Difficulty : Normal(0-7) and Hard(0-9)
         choice = input(f"Welcome {player_name}! Choose difficulty (Normal/Hard): ").strip().lower()
+        print()
         if choice == "hard":
             # Hard: 0–9, 1 hint
             start_game_with_lvl(digit_max=9, hints_max=1, attempts=10, secret_len=4, player_name=player_name, difficulty_label='hard')
