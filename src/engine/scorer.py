@@ -21,7 +21,7 @@ def score_guess(secret_nums: List, guess_nums: List) -> Tuple:
         if secret_nums[i] == guess_nums[i]:
             cl += 1
 
-    # Travers secret_nums count dpulictes and store them in the dict
+    # Travers secret_nums count duplictes and store them in the dict
     for el in secret_nums:
         secret_freq[el] = secret_freq.get(el, 0) + 1
 
