@@ -1,0 +1,9 @@
+Leader board
+
+Top k of player who won must (top 5)
+1. SQLite DB
+2. Tracking winner by ID (unique_name)
+3. Assign ID for the player in the beginning
+4. Dictionary to track player and amount of the wins : {id : value_of_wins}
+5. SQLite tables >> player : id_player_sql, python_id, player_name ; status : id_player_sql, amount_wins
+6. "Place | Player name | Amount of wins "

@@ -16,13 +16,13 @@ def parse_guess_line(raw: str, secret_len: int = 4, digit_min: int = 0, digit_ma
     - Returns secret_len ints in [digit_min..digit_max] or raises ValueError.
     """
 
-    s = raw.strip()
+    s = raw.strip() # remove leading and trailing characters
 
     # 1. String not empty
     if not s:
         raise ValueError("Empty input. Please enter digits.")
 
-    # 2. Any mix of commas/whitespace; explode digit-runs into single digits
+    # 2. Any mix of commas; explored digit-runs into single digits
     parts = s.replace(",", " ").split()
     digits = []
 
@@ -31,7 +31,7 @@ def parse_guess_line(raw: str, secret_len: int = 4, digit_min: int = 0, digit_ma
         # Compact form like "1425"
         for ch in parts[0]:
             digits.append(int(ch))
-    # 4. Check each token is an int
+    # 4. Check each token is an int (not string)
     else:
         for p in parts:
             if not p.isdigit():
@@ -88,6 +88,7 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
         # 1. Quit the game
         if raw == "quit":
             print("Goodbye! Game aborted.")
+            print(f"Thanks for playing, {player_name}! 👋")
             return
         
         # 2. Check history of previous guess (during the game)
@@ -126,10 +127,9 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
             continue
             # Loop continues to re-prompt
 
-        
-        # 5. Guess Numbers (Logic)
+        # 5. Guess Numbers (General logic)
         cn, cl = score_guess(secret_nums, guess)
-        # Track guesses in the history board
+        # Tracking guesses in the history board
         history.append({'guess': guess, 'CL' : cl, 'CN' : cn}) # Able to check during the game
 
         # Results of guess (during the game)
@@ -151,6 +151,9 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
 
             # Save only winners
             save_result(player_name, attempts_used, difficulty_label, "win", first_try)
+
+            # Save win game
+            save_win_game(player_name, difficulty_label, "win")
 
             # Kitten-shelter joke for first-try
             if first_try:
@@ -176,6 +179,9 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
                     print("Invalid option. Please type 'results', 'quit', or press Enter.")
                     # loop continues and asks again
 
+            print(f"\nThanks for playing, {player_name}! 👋")
+            return
+
         attempts_left -= 1
         print(f"Attempts left: {attempts_left}")
 
@@ -183,6 +189,7 @@ def start_game_with_lvl(digit_max: int, hints_max: int, attempts: int = 10, secr
     # Check attempts_left and history elements in the end of the game; and check at the last guess in the history + the number of correct locations. 
     if attempts_left == 0 and (not history or history[-1]['CL'] != secret_len):
         print(f"\nGame Over! The player’s guess was incorrect. The secret numbers are {secret_nums}")
+        print(f"Thanks for playing, {player_name}! 👋")
 
 
 def main(): 
@@ -191,7 +198,7 @@ def main():
     init_db()  # make sure the DB/table exists
 
     # Enter your name
-    player_name = input("Enter your name: ").strip() or "Player"
+    player_name = input("Enter your name: ").strip() or "Player" # unique_name
 
     while True:
         # Select Difficulty : Normal(0-7) and Hard(0-9) (loop until valid input)

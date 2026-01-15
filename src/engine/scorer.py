@@ -21,14 +21,14 @@ def score_guess(secret_nums: List, guess_nums: List) -> Tuple:
         if secret_nums[i] == guess_nums[i]:
             cl += 1
 
-    # Travers secret_nums count duplictes and store them in the dict
+    # Travers secret_nums count duplictes and store them in the dict > 2234
     for el in secret_nums:
-        secret_freq[el] = secret_freq.get(el, 0) + 1
+        secret_freq[el] = secret_freq.get(el, 0) + 1 # {2: 2, 3: 1, 4: 1}
 
     # Travers num_check and decrese dict values
-    for el in guess_nums:
+    for el in guess_nums: # > 2234
         if el in secret_freq:
-            if secret_freq.get(el, 0) > 0:
+            if secret_freq.get(el, 0) > 0: # {2: 0, 3: 0, 4: 0}
                 secret_freq[el] -= 1
                 cn += 1
 

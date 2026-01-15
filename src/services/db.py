@@ -29,6 +29,14 @@ def init_db(db_path: str = DB_FILE) -> None:
         );
     """)
 
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS status (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            amount_of_wins TEINTEGERXT NOT NULL,
+        );
+    """)
+
     # Save schema changes to disk and close connection
     conn.commit()
     conn.close()
@@ -110,7 +118,7 @@ def print_top5_table(rows) -> None:
     if not rows:
         print("(no winning results yet)")
         return
-
+    
     # Enumerate gives us the 1-based "Place" number
     for i, row in enumerate(rows, start=1):
         # Row is a tuple like: ("Alice", 3, "normal")
@@ -119,3 +127,41 @@ def print_top5_table(rows) -> None:
         attempts = row[1]
         difficulty = row[2]
         print(f"{i:>5} | {name:<14} | {attempts:^8} | {difficulty}")
+
+
+def save_win_game(
+            name,
+            result,
+            db_path: str = DB_FILE
+            ):
+    wins_tracker = {}
+    wins_tracker[name] = wins_tracker.get(name, 0) + 1
+
+
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+
+    # Using parameter placeholders (?) protects against SQL injection
+    # and avoids manual string formatting.
+    cur.execute(
+        """
+        INSERT INTO status (name, wins_tracker)
+        VALUES (?, ?, ?, ?, ?, ?);
+        """,
+        (
+            name,
+            wins_tracker[name],
+            datetime.utcnow().isoformat(timespec="seconds"),
+        )
+    )
+
+    conn.commit()
+    conn.close()
+
+
+
+    
+    
+
+    
+
